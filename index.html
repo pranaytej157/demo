@@ -1,0 +1,513 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Skill Mapper</title>
+    <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --bg: #0f0f12;
+            --surface: #18181c;
+            --border: #2a2a2e;
+            --text: #e4e4e7;
+            --text-muted: #a1a1aa;
+            --accent: #6366f1;
+            --accent-hover: #818cf8;
+            --success: #22c55e;
+            --warning: #eab308;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'DM Sans', sans-serif;
+            background: var(--bg);
+            color: var(--text);
+            min-height: 100vh;
+            line-height: 1.6;
+        }
+
+        .container {
+            max-width: 900px;
+            margin: 0 auto;
+            padding: 2rem;
+        }
+
+        header {
+            text-align: center;
+            margin-bottom: 2.5rem;
+        }
+
+        h1 {
+            font-size: 1.875rem;
+            font-weight: 700;
+            background: linear-gradient(135deg, #fff 0%, var(--accent) 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+
+        .subtitle {
+            color: var(--text-muted);
+            margin-top: 0.5rem;
+            font-size: 0.95rem;
+        }
+
+        .card {
+            background: var(--surface);
+            border: 1px solid var(--border);
+            border-radius: 12px;
+            padding: 1.5rem;
+            margin-bottom: 1.5rem;
+        }
+
+        label {
+            display: block;
+            font-weight: 500;
+            margin-bottom: 0.5rem;
+            font-size: 0.9rem;
+        }
+
+        textarea {
+            width: 100%;
+            min-height: 180px;
+            padding: 1rem;
+            background: var(--bg);
+            border: 1px solid var(--border);
+            border-radius: 8px;
+            color: var(--text);
+            font-family: inherit;
+            font-size: 0.95rem;
+            resize: vertical;
+        }
+
+        textarea::placeholder {
+            color: var(--text-muted);
+            opacity: 0.8;
+        }
+
+        textarea:focus {
+            outline: none;
+            border-color: var(--accent);
+        }
+
+        .btn {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            gap: 0.5rem;
+            padding: 0.75rem 1.5rem;
+            background: var(--accent);
+            color: white;
+            border: none;
+            border-radius: 8px;
+            font-family: inherit;
+            font-size: 1rem;
+            font-weight: 500;
+            cursor: pointer;
+            transition: background 0.2s;
+        }
+
+        .btn:hover {
+            background: var(--accent-hover);
+        }
+
+        .btn:disabled {
+            opacity: 0.6;
+            cursor: not-allowed;
+        }
+
+        .results {
+            display: none;
+            margin-top: 2rem;
+        }
+
+        .results.visible {
+            display: block;
+        }
+
+        .role-card {
+            background: var(--bg);
+            border: 1px solid var(--border);
+            border-radius: 8px;
+            padding: 1rem 1.25rem;
+            margin-bottom: 0.75rem;
+        }
+
+        .role-block {
+            margin-bottom: 2rem;
+        }
+
+        .role-block:last-child {
+            margin-bottom: 0;
+        }
+
+        .role-block-title {
+            font-size: 1.1rem;
+            font-weight: 600;
+            margin-bottom: 1rem;
+            padding-bottom: 0.5rem;
+            border-bottom: 1px solid var(--border);
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .role-subsection {
+            margin-bottom: 1rem;
+        }
+
+        .role-subsection:last-child {
+            margin-bottom: 0;
+        }
+
+        .role-subsection h4 {
+            font-size: 0.8rem;
+            font-weight: 600;
+            color: var(--text-muted);
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+            margin-bottom: 0.5rem;
+        }
+
+        .role-name {
+            font-weight: 600;
+            margin-bottom: 0.5rem;
+            color: var(--accent);
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .role-badge {
+            font-size: 0.65rem;
+            padding: 0.2rem 0.5rem;
+            background: var(--accent);
+            color: white;
+            border-radius: 4px;
+            font-weight: 500;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+        }
+
+        .skill-list {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 0.35rem;
+        }
+
+        .skill-tag {
+            padding: 0.25rem 0.6rem;
+            border-radius: 6px;
+            font-size: 0.8rem;
+            font-weight: 500;
+        }
+
+        .skill-tag.matched {
+            background: rgba(34, 197, 94, 0.2);
+            color: var(--success);
+        }
+
+        .skill-tag.missing {
+            background: rgba(234, 179, 8, 0.2);
+            color: var(--warning);
+        }
+
+        select {
+            width: 100%;
+            padding: 0.75rem 1rem;
+            background: var(--bg);
+            border: 1px solid var(--border);
+            border-radius: 8px;
+            color: var(--text);
+            font-family: inherit;
+            font-size: 0.95rem;
+        }
+
+        select:focus {
+            outline: none;
+            border-color: var(--accent);
+        }
+
+        .role-search-row {
+            margin-bottom: 1.25rem;
+        }
+
+        .role-search-row input {
+            width: 100%;
+            padding: 0.75rem 1rem;
+            background: var(--surface);
+            border: 1px solid var(--border);
+            border-radius: 8px;
+            color: var(--text);
+            font-family: inherit;
+            font-size: 0.95rem;
+        }
+
+        .role-search-row input::placeholder {
+            color: var(--text-muted);
+        }
+
+        .role-search-row input:focus {
+            outline: none;
+            border-color: var(--accent);
+        }
+
+        .form-row {
+            margin-bottom: 1rem;
+        }
+
+        .form-row:last-of-type {
+            margin-bottom: 0;
+        }
+
+        .roadmap-steps {
+            list-style: none;
+            margin-top: 0.5rem;
+        }
+
+        .roadmap-steps li {
+            padding: 0.35rem 0;
+            padding-left: 1.25rem;
+            position: relative;
+            font-size: 0.9rem;
+            color: var(--text-muted);
+        }
+
+        .roadmap-steps li::before {
+            content: '→';
+            position: absolute;
+            left: 0;
+            color: var(--accent);
+            font-weight: 600;
+        }
+
+        .error-msg {
+            background: rgba(239, 68, 68, 0.15);
+            color: #f87171;
+            padding: 1rem;
+            border-radius: 8px;
+            margin-top: 1rem;
+            display: none;
+        }
+
+        .error-msg.visible {
+            display: block;
+        }
+
+        .spinner {
+            width: 18px;
+            height: 18px;
+            border: 2px solid rgba(255,255,255,0.3);
+            border-top-color: white;
+            border-radius: 50%;
+            animation: spin 0.7s linear infinite;
+        }
+
+        @keyframes spin {
+            to { transform: rotate(360deg); }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1>Skill Mapper</h1>
+            <p class="subtitle">Paste a course syllabus to map skills to roles and get a learning roadmap</p>
+        </header>
+
+        <div class="card">
+            <div class="form-row">
+                <label for="targetRole">Your target role / stream</label>
+                <select id="targetRole">
+                    <option value="">Loading roles...</option>
+                </select>
+                <p style="font-size: 0.8rem; color: var(--text-muted); margin-top: 0.35rem;">Your chosen role will appear first in the results</p>
+            </div>
+            <div class="form-row" style="margin-top: 1rem;">
+                <label for="syllabus">Syllabus / Course Content</label>
+                <textarea id="syllabus" placeholder="Paste your syllabus text here... e.g., Python basics, data structures, machine learning, SQL..."></textarea>
+            </div>
+            <button class="btn" id="submitBtn" style="margin-top: 1rem;">
+                Analyze Skills
+            </button>
+        </div>
+
+        <div class="error-msg" id="errorMsg"></div>
+
+        <div class="results" id="results">
+            <div id="resultsContainer"></div>
+        </div>
+    </div>
+
+    <script>
+        const syllabusInput = document.getElementById('syllabus');
+        const targetRoleSelect = document.getElementById('targetRole');
+        const submitBtn = document.getElementById('submitBtn');
+        const resultsDiv = document.getElementById('results');
+        const errorMsg = document.getElementById('errorMsg');
+
+        // Load available roles on page load
+        fetch('/api/roles')
+            .then(r => r.json())
+            .then(data => {
+                const roles = data.roles || [];
+                targetRoleSelect.innerHTML = '<option value="">All roles (no preference)</option>' +
+                    roles.map(r => `<option value="${escapeAttr(r)}">${escapeHtml(r)}</option>`).join('');
+            })
+            .catch(() => {
+                targetRoleSelect.innerHTML = '<option value="">Could not load roles</option>';
+            });
+
+        submitBtn.addEventListener('click', analyzeSkills);
+
+        function escapeAttr(str) {
+            return String(str)
+                .replace(/&/g, '&amp;')
+                .replace(/"/g, '&quot;')
+                .replace(/'/g, '&#39;')
+                .replace(/</g, '&lt;')
+                .replace(/>/g, '&gt;');
+        }
+
+        async function analyzeSkills() {
+            const syllabus = syllabusInput.value.trim();
+            if (!syllabus) {
+                showError('Please enter syllabus text.');
+                return;
+            }
+
+            submitBtn.disabled = true;
+            submitBtn.innerHTML = '<span class="spinner"></span> Analyzing...';
+            hideError();
+            resultsDiv.classList.remove('visible');
+
+            try {
+                const response = await fetch('/map_skills', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ syllabus })
+                });
+
+                if (!response.ok) {
+                    const err = await response.json().catch(() => ({}));
+                    throw new Error(err.message || `Server error: ${response.status}`);
+                }
+
+                const data = await response.json();
+                renderResults(data);
+                resultsDiv.classList.add('visible');
+            } catch (err) {
+                showError(err.message || 'Failed to connect to backend. Is the Flask server running?');
+            } finally {
+                submitBtn.disabled = false;
+                submitBtn.textContent = 'Analyze Skills';
+            }
+        }
+
+        function renderResults(data) {
+            const { matched_skills, missing_skills, roadmap } = data;
+            const targetRole = targetRoleSelect.value.trim();
+
+            const allRoles = Object.keys(matched_skills || {});
+            const targetRoleLower = (targetRole || '').toLowerCase();
+            const targetRoleMatch = allRoles.find(r => r.toLowerCase() === targetRoleLower);
+            const targetRoles = targetRole && targetRoleMatch ? [targetRoleMatch] : [];
+            const otherRoles = allRoles.filter(r => r.toLowerCase() !== targetRoleLower);
+
+            // Target role section (shown first)
+            const targetHtml = targetRoles.map(role => renderRoleBlock(role, matched_skills, missing_skills, roadmap, true)).join('');
+
+            // Search bar + other roles
+            const searchHtml = otherRoles.length ? `
+                <div class="role-search-row">
+                    <input type="search" id="roleSearch" placeholder="Search other roles..." autocomplete="off">
+                </div>
+            ` : '';
+
+            const otherHtml = otherRoles.map(role => renderRoleBlock(role, matched_skills, missing_skills, roadmap, false, true)).join('');
+
+            document.getElementById('resultsContainer').innerHTML = 
+                (targetHtml ? `<div id="targetRoleSection">${targetHtml}</div>` : '') +
+                (otherRoles.length ? `
+                    <div id="otherRolesSection">
+                        ${searchHtml}
+                        <div id="otherRolesContainer">${otherHtml}</div>
+                    </div>
+                ` : '');
+
+            if (otherRoles.length) {
+                document.getElementById('roleSearch').addEventListener('input', filterOtherRoles);
+            }
+        }
+
+        function filterOtherRoles() {
+            const query = (document.getElementById('roleSearch').value || '').trim().toLowerCase();
+            const blocks = document.querySelectorAll('#otherRolesContainer .role-block');
+            blocks.forEach(block => {
+                const role = block.getAttribute('data-role') || '';
+                const match = !query || role.toLowerCase().includes(query);
+                block.style.display = match ? '' : 'none';
+            });
+        }
+
+        function renderRoleBlock(role, matched_skills, missing_skills, roadmap, isTarget, isSearchable) {
+            const matched = (matched_skills && matched_skills[role]) || [];
+            const missing = (missing_skills && missing_skills[role]) || [];
+            const roadmapSteps = (roadmap && roadmap[role]) || {};
+
+            const badgeHtml = isTarget ? '<span class="role-badge">Your target</span>' : '';
+            const dataRoleAttr = isSearchable ? ` data-role="${escapeAttr(role)}"` : '';
+
+            return `
+                <div class="role-block"${dataRoleAttr}>
+                    <div class="role-block-title">${escapeHtml(role)} ${badgeHtml}</div>
+                    <div class="role-card">
+                        <div class="role-subsection">
+                            <h4>Matched Skills (covered in syllabus)</h4>
+                            <div class="skill-list">
+                                ${matched.length ? matched.map(s => `<span class="skill-tag matched">${escapeHtml(s)}</span>`).join('') : '<span style="color: var(--text-muted); font-size: 0.9rem;">None</span>'}
+                            </div>
+                        </div>
+                        <div class="role-subsection">
+                            <h4>Missing Skills (to learn)</h4>
+                            <div class="skill-list">
+                                ${missing.length ? missing.map(s => `<span class="skill-tag missing">${escapeHtml(s)}</span>`).join('') : '<span style="color: var(--text-muted); font-size: 0.9rem;">None – you have all required skills!</span>'}
+                            </div>
+                        </div>
+                        <div class="role-subsection">
+                            <h4>Learning Roadmap</h4>
+                            ${Object.keys(roadmapSteps).length ? Object.entries(roadmapSteps).map(([skill, steps]) => `
+                                <div style="margin-top: 0.75rem;">
+                                    <strong style="font-size: 0.85rem;">${escapeHtml(skill)}</strong>
+                                    <ul class="roadmap-steps">${(steps || []).map(s => `<li>${escapeHtml(s)}</li>`).join('')}</ul>
+                                </div>
+                            `).join('') : '<span style="color: var(--text-muted); font-size: 0.9rem;">No missing skills – no roadmap needed</span>'}
+                        </div>
+                    </div>
+                </div>
+            `;
+        }
+
+        function escapeHtml(str) {
+            const div = document.createElement('div');
+            div.textContent = str;
+            return div.innerHTML;
+        }
+
+        function showError(msg) {
+            errorMsg.textContent = msg;
+            errorMsg.classList.add('visible');
+        }
+
+        function hideError() {
+            errorMsg.classList.remove('visible');
+        }
+    </script>
+</body>
+</html>
